@@ -1,7 +1,13 @@
-python manage.py db init
+# Before writing code
+- python manage.py db init
+- python manage.py db migrate
+- python manage.py db upgrade
 
-python manage.py db migrate
+# Package Install
+- pip install -r requirements.txt
 
-python manage.py db upgrade
+# Running tests
+- python test_config.py
 
-python test_bucketlist.py
+# Run server
+- flask run
