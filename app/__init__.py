@@ -13,7 +13,7 @@ db = SQLAlchemy()
 
 
 def create_app(config_name = None):
-    from app.models import Config, Workflow, Rules
+    from app.models import Config, Workflow, Rules, Menu, Swagger
     
     app = FlaskAPI(__name__, instance_relative_config=True)
     CORS(app)
@@ -310,6 +310,194 @@ def create_app(config_name = None):
                 'Age': rule.Age,
                 'date_created': rule.date_created,
                 'date_modified': rule.date_modified
+            })
+            response.status_code = 200
+            return response
+        
+    @app.route('/api/menu/', methods=['POST', 'GET'])
+    @cross_origin()
+    def menulist():
+        if request.method == "POST":
+            id = str(request.data.get('id', ''))
+            if id:
+                menu = Menu(id= id, 
+                                title = request.data.get("title"), 
+                                nodes = request.data.get("nodes"), 
+                                label = request.data.get("label"))
+                menu.save()
+                response = jsonify({
+                    'id': menu.id,
+                    'title': menu.title,
+                    'nodes': menu.nodes,
+                    'label': menu.label,
+                    'date_created': menu.date_created,
+                    'date_modified': menu.date_modified
+                })
+                response.status_code = 201
+                return response
+        else:
+            # GET
+            menus = Menu.get_all()
+            results = []
+
+            for menu in menus:
+                obj = {
+                    'count': menu.count,
+                    'id': menu.id,
+                    'title': menu.title,
+                    'nodes': menu.nodes,
+                    'label': menu.label,
+                    'date_created': menu.date_created,
+                    'date_modified': menu.date_modified
+                }
+                results.append(obj)
+            response = jsonify(results)
+            response.status_code = 200
+            return response
+        
+    @app.route('/api/menu/<string:id>', methods=['GET', 'PUT', 'DELETE'])
+    @cross_origin()
+    def menulist_manipulation(id, **kwargs):
+        # retrieve a menu using it's ID
+        menu = Menu.query.filter_by(id=id).first()
+        if not menu:
+            # Raise an HTTPException with a 404 not found status code
+            abort(404)
+
+        if request.method == 'DELETE':
+            menu.delete()
+            return {
+            "message": "menu {} deleted successfully".format(menu.id) 
+         }, 200
+
+        elif request.method == 'PUT':
+            id = str(request.data.get('id', ''))
+            menu.id = id
+            menu.title = request.data.get("title")
+            menu.nodes = request.data.get("nodes")
+            menu.label = request.data.get("label")
+            menu.save()
+            response = jsonify({
+                'id': menu.id,
+                'title': menu.title,
+                'nodes': menu.nodes,
+                'label': menu.label,
+                'date_created': menu.date_created,
+                'date_modified': menu.date_modified
+            })
+            response.status_code = 200
+            return response
+        else:
+            # GET
+            response = jsonify({
+                'count': menu.count,
+                'id': menu.id,
+                'title': menu.title,
+                'nodes': menu.nodes,
+                'label': menu.label,
+                'date_created': menu.date_created,
+                'date_modified': menu.date_modified
+            })
+            response.status_code = 200
+            return response
+        
+    @app.route('/api/swagger/', methods=['POST', 'GET'])
+    @cross_origin()
+    def swaggerlist():
+        if request.method == "POST":
+            swagger = str(request.data.get('swagger', ''))
+            if swagger:
+                swagger = Swagger(swagger= swagger, 
+                                info = request.data.get("info"), 
+                                host = request.data.get("host"), 
+                                basePath = request.data.get("basePath"),
+                                schemes = request.data.get("schemes"), 
+                                paths = request.data.get("paths"), 
+                                definitions = request.data.get("definitions"))
+                                
+                swagger.save()
+                response = jsonify({
+                    'swagger': swagger.swagger,
+                    'info': swagger.info,
+                    'host': swagger.host,
+                    'basePath': swagger.basePath,
+                    'schemes': swagger.schemes,
+                    'paths': swagger.paths,
+                    'definitions': swagger.definitions,
+                    'date_created': swagger.date_created,
+                    'date_modified': swagger.date_modified
+                })
+                response.status_code = 201
+                return response
+        else:
+            # GET
+            swaggers = Swagger.get_all()
+            swagger = swaggers[0];
+            obj = {
+                'swagger': swagger.swagger,
+                'info': swagger.info,
+                'host': swagger.host,
+                'basePath': swagger.basePath,
+                'schemes': swagger.schemes,
+                'paths': swagger.paths,
+                'definitions': swagger.definitions,
+                'date_created': swagger.date_created,
+                'date_modified': swagger.date_modified
+            }
+            response = jsonify(obj)
+            response.status_code = 200
+            return response
+        
+    @app.route('/api/swagger/<string:swagger>', methods=['GET', 'PUT', 'DELETE'])
+    @cross_origin()
+    def swaggerlist_manipulation(swagger, **kwargs):
+        # retrieve a menu using it's ID
+        swagger = Swagger.query.filter_by(swagger=swagger).first()
+        if not swagger:
+            # Raise an HTTPException with a 404 not found status code
+            abort(404)
+
+        if request.method == 'DELETE':
+            swagger.delete()
+            return {
+            "message": "swagger {} deleted successfully".format(swagger.swagger) 
+         }, 200
+
+        elif request.method == 'PUT':
+            swagger = str(request.data.get('swagger', ''))
+            swagger.swagger = swagger
+            swagger.info = request.data.get("info")
+            swagger.host = request.data.get("host")
+            swagger.basePath = request.data.get("basePath")
+            swagger.schemes = request.data.get("schemes")
+            swagger.paths = request.data.get("paths")
+            swagger.definitions = request.data.get("definitions")
+            swagger.save()
+            response = jsonify({
+                'swagger': swagger.swagger,
+                'info': swagger.info,
+                'host': swagger.host,
+                'basePath': swagger.basePath,
+                'schemes': swagger.schemes,
+                'paths': swagger.paths,
+                'definitions': swagger.definitions,
+                'date_created': swagger.date_created,
+                'date_modified': swagger.date_modified
+            })
+            response.status_code = 200
+            return response
+        else:
+            # GET
+            response = jsonify({
+                'swagger': swagger.swagger,
+                'info': swagger.info,
+                'host': swagger.host,
+                'basePath': swagger.basePath,
+                'schemes': swagger.schemes,
+                'paths': swagger.paths,
+                'definitions': swagger.definitions,
+                'date_created': swagger.date_created,
+                'date_modified': swagger.date_modified
             })
             response.status_code = 200
             return response

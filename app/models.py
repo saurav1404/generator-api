@@ -3,7 +3,7 @@
 from app import db
 
 class Config(db.Model):
-    """This class represents the bucketlist table."""
+    """This class represents the config table."""
 
     __tablename__ = 'config'
 
@@ -41,7 +41,7 @@ class Config(db.Model):
     
     
 class Workflow(db.Model):
-    """This class represents the bucketlist table."""
+    """This class represents the workflow table."""
 
     __tablename__ = 'workflow'
     
@@ -88,7 +88,7 @@ class Workflow(db.Model):
     
     
 class Rules(db.Model):
-    """This class represents the bucketlist table."""
+    """This class represents the rules table."""
 
     __tablename__ = 'rules'
     
@@ -122,3 +122,86 @@ class Rules(db.Model):
 
     def __repr__(self):
         return "<Rules: {}>".format(self.Name)
+    
+    
+class Menu(db.Model):
+    """This class represents the menu table."""
+
+    __tablename__ = 'menu'
+
+    count = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String(36))
+    title = db.Column(db.String(255))
+    nodes = db.Column(db.JSON)
+    label = db.Column(db.Integer)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(
+        db.DateTime, default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp())
+
+    def __init__(self, id, title, nodes, label):
+        """initialize with id."""
+        self.id = id
+        self.title = title
+        self.nodes = nodes
+        self.label = label
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        return Menu.query.all()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return "<Menu: {}>".format(self.title)
+    
+
+class Swagger(db.Model):
+    """This class represents the bucketlist table."""
+
+    __tablename__ = 'swagger'
+
+    count = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    swagger = db.Column(db.String(100))
+    info = db.Column(db.JSON)
+    host = db.Column(db.String(100))
+    basePath = db.Column(db.String(100))
+    schemes = db.Column(db.JSON)
+    paths = db.Column(db.JSON)
+    definitions = db.Column(db.JSON)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(
+        db.DateTime, default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp())
+
+    def __init__(self, swagger, info, host, basePath, schemes, paths, definitions):
+        """initialize with swagger."""
+        self.swagger = swagger
+        self.info = info
+        self.host = host
+        self.basePath = basePath
+        self.schemes = schemes
+        self.paths = paths
+        self.definitions = definitions
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        return Swagger.query.all()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return "<Swagger: {}>".format(self.swagger)
+    
