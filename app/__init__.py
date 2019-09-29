@@ -1,4 +1,5 @@
 # app/__init__.py
+import subprocess 
 
 from flask_api import FlaskAPI
 from flask_cors import CORS, cross_origin
@@ -115,7 +116,6 @@ def create_app(config_name = None):
     @app.route('/api/workflow/', methods=['POST', 'GET'])
     @cross_origin()
     def workflowlist():
-        print(request)
         if request.method == "POST":
             RelId = str(request.data.get('RelId', ''))
             if RelId:
@@ -501,5 +501,16 @@ def create_app(config_name = None):
             })
             response.status_code = 200
             return response
-        
+     
+    @app.route('/api/command/', methods=['POST'])
+    @cross_origin()
+    def runcommand():
+        commands = request.data.get("commands")
+        if commands:
+            for command in commands:
+                subprocess.call(command, shell=True)
+            response = jsonify()
+            response.status_code = 201
+            return response
+           
     return app
